@@ -148,15 +148,15 @@ func (eng *Engine) SetFEN(fen string) error {
 	return err
 }
 
-// GoDepth takes a depth and an optional uint flag that configures filters
-// for the results being returned.
-func (eng *Engine) GoDepth(depth int, resultOpts ...uint) (*Results, error) {
+// Go takes a type of limit, an amount to limit by, and an optional uint flag
+// that configures filters for the results being returned.
+func (eng *Engine) Go(limit string, value int, resultOpts ...uint) (*Results, error) {
 	res := Results{}
 	resultOpt := uint(0)
 	if len(resultOpts) == 1 {
 		resultOpt = resultOpts[0]
 	}
-	_, err := eng.stdin.WriteString(fmt.Sprintf("go depth %d\n", depth))
+	_, err := eng.stdin.WriteString(fmt.Sprintf("go %s %d\n", limit, value))
 	if err != nil {
 		return nil, err
 	}
@@ -185,9 +185,6 @@ func (eng *Engine) GoDepth(depth int, resultOpts ...uint) (*Results, error) {
 		}
 	}
 	for _, v := range res.results {
-		if resultOpt&HighestDepthOnly != 0 && v.Depth != depth {
-			continue
-		}
 		if resultOpt&IncludeUpperbounds == 0 && v.Upperbound {
 			continue
 		}
